@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>線上菜單</title>
+    <style>
+        /* 基礎樣式重設 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+        }
+
+        body {
+            background-color: #faf8f5;
+            color: #333;
+            padding-bottom: 60px;
+        }
+
+        /* 頂部固定區域（包含 Logo 與 分類選單） */
+        .header-fixed {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        /* Logo 區塊 */
+        .logo-area {
+            text-align: center;
+            padding: 20px 0 10px 0;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0eae1;
+        }
+
+        /* 網頁往下拉時縮小 Logo */
+        .header-fixed.shrink .logo-area {
+            padding: 8px 0;
+            font-size: 16px;
+        }
+
+        /* 可橫向滑動的分類選單 */
+        .category-nav {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            background-color: #f6f1eb;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .category-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-item {
+            display: inline-block;
+            padding: 15px 25px;
+            font-size: 16px;
+            color: #666;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .category-item.active {
+            color: #8c6a5c;
+            font-weight: bold;
+            border-bottom: 3px solid #8c6a5c;
+            background-color: #ffffff;
+        }
+
+        /* 菜單內容主體區塊 */
+        .menu-container {
+            margin-top: 150px;
+            padding: 20px;
+            transition: margin-top 0.3s ease;
+        }
+
+        .header-fixed.shrink + .menu-container {
+            margin-top: 95px;
+        }
+
+        /* 子分類標題 */
+        .sub-category-title {
+            font-size: 18px;
+            color: #555;
+            margin: 25px 0 15px 0;
+            padding-left: 8px;
+            border-left: 4px solid #8c6a5c;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sub-category-title span {
+            font-size: 12px;
+            color: #999;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        /* 單一菜單品項（改為含有圖片的排列組合） */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px dashed #e6dfd5;
+            pointer-events: none; /* 關鍵：禁止這整個區塊的任何滑鼠/觸控點擊事件，徹底防止誤點 */
+        }
+
+        /* 商品縮圖外框 */
+        .item-img-box {
+            width: 65px;
+            height: 65px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #eae3da; /* 沒圖片時的預設文青底色 */
+            margin-right: 15px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 商品圖片 */
+        .item-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 讓圖片自動裁切填滿正方形，不變形 */
+        }
+
+        /* 沒圖片時顯示的文字樣式 */
+        .no-img-text {
+            font-size: 11px;
+            color: #b0a394;
+            letter-spacing: 1px;
+        }
+
+        /* 文字資訊區塊 */
+        .item-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-info {
+            padding-right: 15px;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 4px;
+        }
+
+        .item-en-name {
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* 價格樣式 */
+        .price-info {
+            text-align: right;
+            font-size: 16px;
+            font-weight: 600;
+            color: #444;
+            white-space: nowrap;
+        }
+
+        .price-row {
+            font-size: 14px;
+            color: #555;
+            margin-top: 2px;
+        }
+        .price-label {
+            font-size: 12px;
+            color: #888;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-fixed" id="header">
+        <div class="logo-area">ASAHI CAFE</div>
+        <div class="category-nav">
+            <a href="#coffee" class="category-item active">咖啡 Coffee</a>
+            <a href="#dessert" class="category-item">甜點 Desserts</a>
+            <a href="#sparkling" class="category-item">汽泡飲 Sparkling</a>
+        </div>
+    </div>
+
+    <div class="menu-container">
+        
+        <div id="coffee-section">
+            <div class="sub-category-title">
+                經典咖啡 <span>Classic Coffee</span>
+            </div>
+
+            <div class="menu-item">
+                <div class="item-img-box">
+                    <img src="https://picsum.photos/150/150?random=1" alt="拿鐵"> 
+                </div>
+                <div class="item-content">
+                    <div class="item-info">
+                        <div class="item-name">拿鐵</div>
+                        <div class="item-en-name">Latte (H / I)</div>
+                    </div>
+                    <div class="price-info">160</div>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <div class="item-img-box">
+                    <img src="https://picsum.photos/150/150?random=2" alt="手沖">
+                </div>
+                <div class="item-content">
+                    <div class="item-info">
+                        <div class="item-name">手沖</div>
+                        <div class="item-en-name">Hand Drip (H / I)</div>
+                    </div>
+                    <div class="price-info">120</div>
+                </div>
+            </div>
+
+            <div class="sub-category-title">
+                台灣產地咖啡 <span>Taiwan Single Origin</span>
+            </div>
+
+            <div class="menu-item">
+                <div class="item-img-box">
+                    <span class="no-img-text">CAFE</span>
+                </div>
+                <div class="item-content">
+                    <div class="item-info">
+                        <div class="item-name">阿里山</div>
+                        <div class="item-en-name">Alishan</div>
+                    </div>
+                    <div class="price-info">
+                        <div class="price-row"><span class="price-label">熱 H:</span>200</div>
+                        <div class="price-row"><span class="price-label">冰 I:</span>210</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <div class="item-img-box">
+                    <span class="no-img-text">CAFE</span>
+                </div>
+                <div class="item-content">
+                    <div class="item-info">
+                        <div class="item-name">太麻里</div>
+                        <div class="item-en-name">Taimali</div>
+                    </div>
+                    <div class="price-info">
+                        <div class="price-row"><span class="price-label">熱 H:</span>200</div>
+                        <div class="price-row"><span class="price-label">冰 I:</span>210</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        window.onscroll = function() {
+            var header = document.getElementById("header");
+            if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+                header.classList.add("shrink");
+            } else {
+                header.classList.remove("shrink");
+            }
+        };
+    </script>
+
+</body>
+</html>
